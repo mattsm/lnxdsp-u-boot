@@ -5,6 +5,7 @@
 
 extra-y        := hello_world
 extra-$(CONFIG_SPI_FLASH_ATMEL)    += atmel_df_pow2
+extra-$(CONFIG_SC59X_64)    	   += adi_spimem
 extra-$(CONFIG_PPC)                += sched
 
 #
