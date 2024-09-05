@@ -87,3 +87,5 @@
 	EXPORT_FUNC(miiphy_set_current_dev, int, miiphy_set_current_dev,
 		    const char *devname)
 #endif
+	EXPORT_FUNC(flush_dcache_range, void, flush_dcache_range, unsigned long,
+		       	unsigned long)
