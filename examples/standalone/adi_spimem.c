@@ -18,12 +18,14 @@
 #define SPI2_REGS ((void *)0x31030000)
 #define SPI2_MMAP ((void *)0x60000000)
 #define LINUX_SRC (SPI2_MMAP + 0x01a0000)
-#define LINUX_SZ (0x1000000)
+#define LINUX_SZ (0x3E60000)
 #define LOADADDR ((void *)0x90001000)
 
 struct adi_spi_regs;
 void chip_select_en(struct adi_spi_regs *raw_spi);
 void memmap_quad_en(struct adi_spi_regs * raw_spi);
+
+static u32 memcopy_dma(u32 *data, u32 *flash_source, size_t len);
 
 int adi_spimem(int argc, char *const argv[])
 {
@@ -80,7 +82,8 @@ int adi_spimem(int argc, char *const argv[])
 	memmap_quad_en(raw_spi);
 
 	printf("copying %p to %p (%d bytes)...\n", LINUX_SRC, LOADADDR, LINUX_SZ);
-	memcpy(LOADADDR, LINUX_SRC, LINUX_SZ);
+	//memcpy(LOADADDR, LINUX_SRC, LINUX_SZ);
+	memcopy_dma(LOADADDR, LINUX_SRC, LINUX_SZ);
 	puts("done.\n");
 
 done2:
@@ -90,6 +93,8 @@ done1:
 
 	return ret;
 }
+
+#include <asm/arch-adi/sc5xx/adi_mdma.h>
 
 struct adi_spi_regs {
 	u32 revid;
@@ -145,9 +150,11 @@ void memmap_quad_en(struct adi_spi_regs *raw_spi) {
 	printf("ssel 0x%p\n", &raw_spi->ssel);
 	writel(0x0000FE02, &raw_spi->ssel); /*  Slave Select Register */
 	printf("mmrdh 0x%p\n", &raw_spi->mmrdh);
-	writel(0x0500136B, &raw_spi->mmrdh);                    /*  Memory Mapped Read Header */
+	writel(0x05003BEB, &raw_spi->mmrdh);                    /*  Memory Mapped Read Header */
 	printf("mmtop 0x%p\n", &raw_spi->mmtop);
 	writel(0x7FFFFFFF, &raw_spi->mmtop);
 	printf("control 0x%p\n", &raw_spi->control);
 	writel(0x80240073, &raw_spi->control);
 }
+
+
